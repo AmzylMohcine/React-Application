@@ -1,18 +1,22 @@
 import React from "react"
-import ReactDOM from "react-dom"
+import ReactDOM from "react-dom/client"
+import Header from "./components/Header"
+import HomeGuest from "./components/HomeGuest"
+import Footer from "./components/Footer"
 
-function ExempleComponent() {
+function Main() {
   return (
-    <div>
-      <h1> our App </h1>
-      <p> the sky is bdldqdqddqsddqdqdue </p>
-    </div>
+    <>
+      <Header />
+      <HomeGuest />
+      <Footer />
+    </>
   )
 }
 
 const root = ReactDOM.createRoot(document.querySelector("#app"))
 
-root.render(<ExempleComponent />)
+root.render(<Main />)
 
 // prevent refreching page
 if (module.hot) {
