@@ -15,6 +15,7 @@ function HomeGuest() {
       console.log("there was an error")
     }
   }
+
   return (
     <>
       <Page title="Welcome " wide={true}>
