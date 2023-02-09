@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import Axios from "axios"
-
+import ExampleContext from "../ExempleContext"
 function HeaderLoggedOut(props) {
+  const { setLoggedin } = useContext(ExampleContext)
+  const { addFlashMessage } = useContext(ExampleContext)
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
 
@@ -10,7 +12,9 @@ function HeaderLoggedOut(props) {
     try {
       const response = await Axios.post("/login", { username, password })
       if (response.data) {
-        props.login(true)
+        addFlashMessage("Connected")
+        setLoggedin(true)
+
         localStorage.setItem("Token-App", response.data.token)
         localStorage.setItem("username-App", response.data.username)
         localStorage.setItem("avatar-App", response.data.avatar)

@@ -1,10 +1,15 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useContext } from "react"
 import { Link } from "react-router-dom"
+import ExampleContext from "../ExempleContext"
 
 function HeaderLoggedIn(props) {
+  const { setLoggedin } = useContext(ExampleContext)
+  const { addFlashMessage } = useContext(ExampleContext)
+
   function handleSubmitOut(e) {
     e.preventDefault()
-    props.login(false)
+    addFlashMessage("Disconnected")
+    setLoggedin(false)
     localStorage.removeItem("Token-App")
     localStorage.removeItem("username-App")
     localStorage.removeItem("avatar-App")

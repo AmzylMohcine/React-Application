@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import Page from "./Page"
 import Axios from "axios"
+// to navigate on diffrent links
 import { useNavigate } from "react-router-dom"
+// import context
+import ExampleContext from "../ExempleContext"
 
 function CreatePost(props) {
   const [title, setTitle] = useState()
   const [body, setBody] = useState()
   const navigate = useNavigate()
-
+  // call flash messages
+  const { addFlashMessage } = useContext(ExampleContext)
   async function handleSubmit(e) {
     e.preventDefault()
     try {
@@ -15,7 +19,7 @@ function CreatePost(props) {
       //redirect to new post url
       navigate(`/post/${response.data}`)
       // add flash message
-      props.addFlashMessage("Congrats , you successfully Created a post ")
+      addFlashMessage("Congrats , you successfully Created a post ")
     } catch (e) {
       console.log("There was a problem")
     }
