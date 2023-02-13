@@ -1,10 +1,14 @@
-import React, { useState, useReducer } from "react"
+import React, { useState, useReducer, useEffect } from "react"
 import ReactDOM from "react-dom/client"
+import { useImmerReducer } from "use-immer"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Axios from "axios"
 
 Axios.defaults.baseURL = "http://localhost:8080"
 
+//import Contexts
+import StateContext from "./StateContext"
+import DispatchContext from "./DispatchContext"
 // my componenets
 import Header from "./components/Header"
 import HomeGuest from "./components/HomeGuest"
@@ -15,42 +19,64 @@ import Home from "./components/Home"
 import CreatePost from "./components/CreatePost"
 import ViewSinglePost from "./components/ViewSinglePost"
 import FlashMessages from "./components/FlashMessages"
-import ExampleContext from "./ExempleContext"
 
 function Main() {
-  const initialState = {}
-  function ourReducer() {}
-  const [state, dispatch] = useReducer(ourReducer, initialState)
-
-  const [loggedIn, setLoggedin] = useState(Boolean(localStorage.getItem("Token-App")))
-  const [flashMessages, setFlashMessages] = useState([])
-
-  function addFlashMessage(msg) {
-    setFlashMessages(prev => prev.concat(msg))
+  // this is initialisestates of useStates
+  const initialState = {
+    loggedIn: Boolean(localStorage.getItem("Token-App")),
+    flashMessages: [],
+    user: {
+      token: localStorage.getItem("Token-App"),
+      username: localStorage.getItem("username-App"),
+      avatar: localStorage.getItem("avatar-App")
+    }
   }
+
+  function ourReducer(draft, action) {
+    switch (action.type) {
+      case "login":
+        draft.loggedIn = true
+        draft.user = action.data
+        return
+      case "logout":
+        draft.loggedIn = false
+        return
+      case "flashMessage":
+        draft.flashMessages.push(action.value)
+        return
+    }
+  }
+  const [state, dispatch] = useImmerReducer(ourReducer, initialState)
+  useEffect(() => {
+    if (state.loggedIn) {
+      localStorage.setItem("Token-App", state.user.token)
+      localStorage.setItem("username-App", state.user.username)
+      localStorage.setItem("avatar-App", state.user.avatar)
+    } else {
+      localStorage.removeItem("Token-App")
+      localStorage.removeItem("username-App")
+      localStorage.removeItem("avatar-App")
+    }
+  }, [state.loggedIn])
+
   return (
-    // Example context provider , to use our methods with context on all board , to not pass it manually
-    <ExampleContext.Provider
-      // value with more than one prop
-      //must be value
-      value={{
-        addFlashMessage,
-        setLoggedin
-      }}
-    >
-      <BrowserRouter>
-        <FlashMessages messages={flashMessages} />
-        <Header loggedIn={loggedIn} />
-        <Routes>
-          <Route path="/" element={loggedIn ? <Home /> : <HomeGuest />} />
-          <Route path="/about-us" element={<About />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/post/:id" element={<ViewSinglePost />} />
-          <Route path="/create-post" element={<CreatePost />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
-    </ExampleContext.Provider>
+    // individual component with different context avd value state and dispatch
+    <StateContext.Provider value={state}>
+      <DispatchContext.Provider value={dispatch}>
+        <BrowserRouter>
+          <FlashMessages messages={state.flashMessages} />
+          <Header />
+          <Routes>
+            <Route path="/" element={state.loggedIn ? <Home /> : <HomeGuest />} />
+            <Route path="/about-us" element={<About />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/post/:id" element={<ViewSinglePost />} />
+            <Route path="/create-post" element={<CreatePost />} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
+      </DispatchContext.Provider>
+    </StateContext.Provider>
   )
 }
 

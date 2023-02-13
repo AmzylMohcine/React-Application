@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from "react"
 import Axios from "axios"
-import ExampleContext from "../ExempleContext"
+import DispatchContext from "../DispatchContext"
 function HeaderLoggedOut(props) {
-  const { setLoggedin } = useContext(ExampleContext)
-  const { addFlashMessage } = useContext(ExampleContext)
+  const appDispatch = useContext(DispatchContext)
+
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
 
@@ -12,12 +12,12 @@ function HeaderLoggedOut(props) {
     try {
       const response = await Axios.post("/login", { username, password })
       if (response.data) {
-        addFlashMessage("Connected")
-        setLoggedin(true)
-
-        localStorage.setItem("Token-App", response.data.token)
-        localStorage.setItem("username-App", response.data.username)
-        localStorage.setItem("avatar-App", response.data.avatar)
+        // set the data in the localstorage
+        // localStorage.setItem("Token-App", response.data.token)
+        // localStorage.setItem("username-App", response.data.username)
+        // localStorage.setItem("avatar-App", response.data.avatar)
+        appDispatch({ type: "login", data: response.data })
+        appDispatch({ type: "flashMessage", value: "you are connected" })
       } else {
         alert("incorrect user & password ")
       }
