@@ -3,6 +3,8 @@ import Page from "./Page"
 import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
 import LoadingDotdsIcon from "./LoadingDotsIcon"
+import reactMarkdown from "react-markdown"
+import { ReactMarkdown } from "react-markdown/lib/react-markdown"
 
 function ViewSinglePost() {
   const [post, setPost] = useState([])
@@ -65,7 +67,9 @@ function ViewSinglePost() {
       </p>
 
       <div className="body-content">
-        <p>{post.body}</p>
+        <p>
+          <ReactMarkdown children={post.body} allowedElements={["p", "br", "em", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li"]} />
+        </p>
       </div>
     </Page>
   )
