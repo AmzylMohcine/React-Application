@@ -2,18 +2,22 @@ import React, { useEffect, useState } from "react"
 import Page from "./Page"
 import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
+import LoadingDotdsIcon from "./LoadingDotsIcon"
 
 function ViewSinglePost() {
   const [post, setPost] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  // take the id params to use it on axios response
   const { id } = useParams()
 
   // run anytime state changes => useEffect
 
   useEffect(() => {
+    const ourRequest = Axios.CancelToken.source()
     async function fetchPosts() {
       try {
-        const response = await Axios.get(`/post/${id}`)
+        // data wa sedn to the server => cancelToken , to cancel when axios do not have any response
+        const response = await Axios.get(`/post/${id}`, { cancelToken: ourRequest.token })
         setPost(response.data)
 
         setIsLoading(false)
@@ -23,9 +27,20 @@ function ViewSinglePost() {
       }
     }
     fetchPosts()
+    return () => {
+      ourRequest.cancel()
+    }
   }, [])
 
-  if (isLoading) return <div> Loading ... </div>
+  if (isLoading)
+    return (
+      <Page>
+        <div>
+          {" "}
+          <LoadingDotdsIcon />
+        </div>
+      </Page>
+    )
   const date = new Date(post.createdDate)
   const dateFormated = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
   return (

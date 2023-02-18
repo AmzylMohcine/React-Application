@@ -3,6 +3,8 @@ import Axios from "axios"
 // to works with params url
 import { useParams } from "react-router-dom"
 import { Link } from "react-router-dom"
+import LoadingDotdsIcon from "./LoadingDotsIcon"
+import Page from "./Page"
 
 function ProfilPosts() {
   const [posts, setPosts] = useState([])
@@ -25,7 +27,7 @@ function ProfilPosts() {
     fetchPosts()
   }, [])
 
-  if (isLoading) return <div> Loading ... </div>
+  if (isLoading) return <LoadingDotdsIcon />
 
   return (
     <div className="list-group">
