@@ -20,6 +20,7 @@ import CreatePost from "./components/CreatePost"
 import ViewSinglePost from "./components/ViewSinglePost"
 import FlashMessages from "./components/FlashMessages"
 import Profil from "./components/Profil"
+import EditPost from "./components/EditPost"
 
 function Main() {
   // this is initialisestates of useStates
@@ -71,7 +72,9 @@ function Main() {
             <Route path="/" element={state.loggedIn ? <Home /> : <HomeGuest />} />
             <Route path="/about-us" element={<About />} />
             <Route path="/terms" element={<Terms />} />
+
             <Route path="/post/:id" element={state.loggedIn ? <ViewSinglePost /> : <HomeGuest />} />
+            <Route path="/post/:id/edit" element={<EditPost />} />
             <Route path="/create-post" element={state.loggedIn ? <CreatePost /> : <HomeGuest />} />
             <Route path="/profil/:username/*" element={state.loggedIn ? <Profil /> : <HomeGuest />} />
           </Routes>
