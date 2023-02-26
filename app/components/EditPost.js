@@ -6,26 +6,30 @@ import { useParams, Link } from "react-router-dom"
 import LoadingDotdsIcon from "./LoadingDotsIcon"
 import StateContext from "../StateContext"
 import DispatchContext from "../DispatchContext"
+import NotFound from "./NotFound"
+import { useNavigate } from "react-router-dom"
 
 function EditPost() {
+  const navigate = useNavigate()
   const appState = useContext(StateContext)
   const appDispatch = useContext(DispatchContext)
 
   const originalState = {
     title: {
       value: "",
-      haseErrors: false,
+      hasErrors: false,
       message: ""
     },
     body: {
       value: "",
-      haseErrors: false,
+      hasErrors: false,
       message: ""
     },
     isFetching: true,
     isSaving: false,
     id: useParams().id,
-    sendCount: 0
+    sendCount: 0,
+    notFound: false
   }
 
   function ourReducer(draft, action) {
@@ -36,13 +40,17 @@ function EditPost() {
         draft.isFetching = false
         return
       case "titleChange":
+        draft.title.hasErrors = false
         draft.title.value = action.value
         return
       case "bodyChange":
+        draft.body.hasErrors = false
         draft.body.value = action.value
         return
       case "submitRequest":
-        draft.sendCount++
+        if (!draft.title.hasErrors && !draft.body.haseErrors) {
+          draft.sendCount++
+        }
         return
 
       case "saveRequestStarted":
@@ -51,12 +59,31 @@ function EditPost() {
       case "saveRequestFinished":
         draft.isSaving = false
         return
+      // check if title is blank
+      case "titleRules":
+        if (!action.value.trim()) {
+          draft.title.hasErrors = true
+          draft.title.message = "You must provide a title"
+        }
+        return
+      // check if body is blank
+      case "bodyRules":
+        if (!action.value.trim()) {
+          draft.body.hasErrors = true
+          draft.body.message = "You must provie a body text "
+        }
+        return
+      case "notFound":
+        draft.notFound = true
+        return
     }
   }
   const [state, dispatch] = useImmerReducer(ourReducer, originalState)
 
   function submitHandler(e) {
     e.preventDefault()
+    dispatch({ type: "titleRules", value: state.title.value })
+    dispatch({ type: "bodyRules", value: state.body.value })
     dispatch({ type: "submitRequest" })
   }
 
@@ -67,10 +94,20 @@ function EditPost() {
     async function fetchPosts() {
       try {
         const response = await Axios.get(`/post/${state.id}`, { cancelToken: ourRequest.token })
+        if (response.data) {
+          dispatch({ type: "fetchComplete", value: response.data })
+          // permission to edit
+          if (appState.user.username != response.data.author.username) {
+            appDispatch({ type: "flashMessage", value: "You do not have permission to edit this post" })
 
-        dispatch({ type: "fetchComplete", value: response.data })
+            //redirect to home page
+            navigate("/")
+          }
+        } else {
+          dispatch({ type: "notFound" })
+        }
 
-        console.log(response.data)
+        // console.log(response.data)
       } catch (e) {
         console.log("there is a problem wih posts")
       }
@@ -104,6 +141,9 @@ function EditPost() {
     }
   }, [state.sendCount])
 
+  if (state.notFound) {
+    return <NotFound />
+  }
   if (state.isFetching)
     return (
       <Page>
@@ -116,19 +156,25 @@ function EditPost() {
 
   return (
     <Page title="edit post ">
-      <form onSubmit={submitHandler}>
+      <Link className="small font-weight-bold" to={`/post/${state.id}`}>
+        &laquo; Back to post permalink{" "}
+      </Link>
+
+      <form className="mt-3" onSubmit={submitHandler}>
         <div className="form-group">
           <label htmlFor="post-title" className="text-muted mb-1">
             <small>Title</small>
           </label>
-          <input onChange={e => dispatch({ type: "titleChange", value: e.target.value })} value={state.title.value} autoFocus name="title" id="post-title" className="form-control form-control-lg form-control-title" type="text" placeholder="" autoComplete="off" />
+          <input onBlur={e => dispatch({ type: "titleRules", value: e.target.value })} onChange={e => dispatch({ type: "titleChange", value: e.target.value })} value={state.title.value} autoFocus name="title" id="post-title" className="form-control form-control-lg form-control-title" type="text" placeholder="" autoComplete="off" />
+          {state.title.hasErrors && <div className="alert alert-danger small liveValidateMessage"> {state.title.message}</div>}
         </div>
 
         <div className="form-group">
           <label htmlFor="post-body" className="text-muted mb-1 d-block">
             <small>Body Content</small>
           </label>
-          <textarea onChange={e => dispatch({ type: "bodyChange", value: e.target.value })} value={state.body.value} name="body" id="post-body" className="body-content tall-textarea form-control" type="text" />
+          <textarea onBlur={e => dispatch({ type: "bodyRules", value: e.target.value })} onChange={e => dispatch({ type: "bodyChange", value: e.target.value })} value={state.body.value} name="body" id="post-body" className="body-content tall-textarea form-control" type="text" />
+          {state.body.hasErrors && <div className="alert alert-danger small liveValidateMessage"> {state.body.message} </div>}
         </div>
 
         <button className="btn btn-primary" disabled={state.isSaving}>

@@ -21,6 +21,7 @@ import ViewSinglePost from "./components/ViewSinglePost"
 import FlashMessages from "./components/FlashMessages"
 import Profil from "./components/Profil"
 import EditPost from "./components/EditPost"
+import NotFound from "./components/NotFound"
 
 function Main() {
   // this is initialisestates of useStates
@@ -77,6 +78,7 @@ function Main() {
             <Route path="/post/:id/edit" element={<EditPost />} />
             <Route path="/create-post" element={state.loggedIn ? <CreatePost /> : <HomeGuest />} />
             <Route path="/profil/:username/*" element={state.loggedIn ? <Profil /> : <HomeGuest />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
         </BrowserRouter>

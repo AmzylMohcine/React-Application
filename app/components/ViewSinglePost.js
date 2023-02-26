@@ -3,9 +3,9 @@ import Page from "./Page"
 import Axios from "axios"
 import { useParams, Link } from "react-router-dom"
 import LoadingDotdsIcon from "./LoadingDotsIcon"
-import reactMarkdown from "react-markdown"
 import { ReactMarkdown } from "react-markdown/lib/react-markdown"
 import ReactTooltip from "react-tooltip"
+import NotFound from "./NotFound"
 
 function ViewSinglePost() {
   const [post, setPost] = useState([])
@@ -34,6 +34,10 @@ function ViewSinglePost() {
       ourRequest.cancel()
     }
   }, [])
+
+  if (!isLoading && !post) {
+    return <NotFound />
+  }
 
   if (isLoading)
     return (
