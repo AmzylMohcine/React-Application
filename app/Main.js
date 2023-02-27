@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client"
 import { useImmerReducer } from "use-immer"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Axios from "axios"
-
+import { CSSTransition } from "react-transition-group"
 Axios.defaults.baseURL = "http://localhost:8080"
 
 //import Contexts
@@ -22,6 +22,7 @@ import FlashMessages from "./components/FlashMessages"
 import Profil from "./components/Profil"
 import EditPost from "./components/EditPost"
 import NotFound from "./components/NotFound"
+import Search from "./components/Search"
 
 function Main() {
   // this is initialisestates of useStates
@@ -32,7 +33,9 @@ function Main() {
       token: localStorage.getItem("Token-App"),
       username: localStorage.getItem("username-App"),
       avatar: localStorage.getItem("avatar-App")
-    }
+    },
+    //search
+    isSearchOpen: false
   }
 
   function ourReducer(draft, action) {
@@ -46,6 +49,12 @@ function Main() {
         return
       case "flashMessage":
         draft.flashMessages.push(action.value)
+        return
+      case "openSearch":
+        draft.isSearchOpen = true
+        return
+      case "closeSearch":
+        draft.isSearchOpen = false
         return
     }
   }
@@ -80,6 +89,10 @@ function Main() {
             <Route path="/profil/:username/*" element={state.loggedIn ? <Profil /> : <HomeGuest />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+
+          <CSSTransition timeout={330} in={state.isSearchOpen} classNames="search-overlay" unmountOnExit>
+            <Search />
+          </CSSTransition>
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
