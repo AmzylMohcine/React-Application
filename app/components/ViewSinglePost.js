@@ -39,7 +39,7 @@ function ViewSinglePost() {
     return () => {
       ourRequest.cancel()
     }
-  }, [])
+  }, [id])
 
   if (!isLoading && !post) {
     return <NotFound />
