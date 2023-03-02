@@ -25,7 +25,7 @@ function ProfilPosts() {
       }
     }
     fetchPosts()
-  }, [])
+  }, [username])
 
   if (isLoading) return <LoadingDotdsIcon />
 
