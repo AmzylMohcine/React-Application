@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useState } from "react"
 import Page from "./Page"
-// access to url parameters
-import { useParams } from "react-router-dom"
+// access to url parameters =>usePARAMS
+// navLink to give links to profiles
+import { useParams, NavLink, Routes, Route } from "react-router-dom"
 import Axios from "axios"
 import StateContext from "../StateContext"
 import ProfilPosts from "./ProfilPosts"
 import { useImmer } from "use-immer"
+import ProfilFollowers from "./ProfileFollowers"
+import ProfilFollowing from "./ProfilFollowing"
 
 function Profil() {
   // returns object with many parameters , distracting all object and take only the username
@@ -77,6 +80,7 @@ function Profil() {
     }
   }, [state.startFollowingRequestCount])
 
+  // stop folliwng
   function stopFollowing() {
     setState(draft => {
       draft.stopFollowingRequestCount++
@@ -127,18 +131,21 @@ function Profil() {
       </h2>
 
       <div className="profile-nav nav nav-tabs pt-2 mb-4">
-        <a href="#" className="active nav-item nav-link">
+        <NavLink to="" end className="nav-item nav-link">
           Posts: {state.profilData.counts.postCount}
-        </a>
-        <a href="#" className="nav-item nav-link">
+        </NavLink>
+        <NavLink to="followers" className="nav-item nav-link">
           Followers: {state.profilData.counts.followerCount}
-        </a>
-        <a href="#" className="nav-item nav-link">
+        </NavLink>
+        <NavLink to="following" className="nav-item nav-link">
           Following: {state.profilData.counts.followingCount}
-        </a>
+        </NavLink>
       </div>
-
-      <ProfilPosts />
+      <Routes>
+        <Route path="" element={<ProfilPosts />} />
+        <Route path="followers" element={<ProfilFollowers />} />
+        <Route path="following" element={<ProfilFollowing />} />
+      </Routes>
     </Page>
   )
 }
