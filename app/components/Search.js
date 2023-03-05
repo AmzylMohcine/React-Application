@@ -103,7 +103,7 @@ function Search() {
             {Boolean(state.results.length) && (
               <div className="list-group shadow-sm">
                 <div className="list-group-item active">
-                  <strong>Search Results</strong> ({state.results.length} {state.results.length > 1 ? "items" : "item"} fouds )
+                  <strong>Search Results</strong> ({state.results.length} {state.results.length > 1 ? "items" : "item"} founds )
                 </div>
                 {/* loop  */}
 

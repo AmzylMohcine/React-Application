@@ -17,13 +17,17 @@ function HeaderLoggedIn(props) {
     e.preventDefault()
     appDispatch({ type: "openSearch" })
   }
+  function handleChatIcon(e) {
+    e.preventDefault()
+    appDispatch({ type: "toggleChat" })
+  }
   return (
     <div className="flex-row my-3 my-md-0">
       <a data-for="searchtooltip" data-tip="Search" onClick={handleSearchIcon} href="#" className="text-white mr-2 header-search-icon">
         <i className="fas fa-search"></i>
       </a>
       <ReactTooltip place="bottom" id="searchtooltip" className="custom-tooltip" />{" "}
-      <span data-for="chat" data-tip="Chat" className="mr-2 header-chat-icon text-white">
+      <span onClick={handleChatIcon} data-for="chat" data-tip="Chat" className="mr-2 header-chat-icon text-white">
         <i className="fas fa-comment"></i>
         <span className="chat-count-badge text-white"> </span>
       </span>
