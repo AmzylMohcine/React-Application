@@ -3,8 +3,9 @@ import StateContext from "../StateContext"
 import DispatchContext from "../DispatchContext"
 import { useImmer } from "use-immer"
 import { io } from "socket.io-client"
+import { Link } from "react-router-dom"
 
-const socket = io("http://localhost:3000")
+const socket = io("http://localhost:8080")
 function Chat() {
   const [state, setState] = useImmer({
     fieldValue: "",
@@ -15,14 +16,25 @@ function Chat() {
   // ref is like a box to hold the value in , we gonna use it to do something to an element
   // in this case we use ref to autofocus on input when the chat it's visible
   const chatField = useRef(null)
+  const chatLog = useRef(null)
 
   // autofocus on the input chat with ref hook
   useEffect(() => {
     if (appState.isChatOpen) {
       chatField.current.focus()
+      appDispatch({ type: "clearChat" })
     }
   }, [appState.isChatOpen])
 
+  // scrooll down to the last message
+  useEffect(() => {
+    chatLog.current.scrollTop = chatLog.current.scrollHeight
+    if (state.chatMessages.length && !appState.isChatOpen) {
+      appDispatch({ type: "incrementChat" })
+    }
+  }, [state.chatMessages])
+
+  // send chat from server
   useEffect(() => {
     socket.on("chatFromServer", message => {
       setState(draft => {
@@ -58,7 +70,7 @@ function Chat() {
           <i className="fas fa-times-circle"></i>
         </span>
       </div>
-      <div id="chat" className="chat-log">
+      <div id="chat" className="chat-log" ref={chatLog}>
         {state.chatMessages.map((message, index) => {
           if (message.username == appState.user.username) {
             return (
@@ -71,15 +83,17 @@ function Chat() {
             )
           }
           return (
-            <div className="chat-other">
-              <a href="#">
+            <div className="chat-other" key={index}>
+              <Link to={`/profil/${message.username}`}>
                 <img className="avatar-tiny" src={message.avatar} />
-              </a>
+              </Link>
               <div className="chat-message">
                 <div className="chat-message-inner">
-                  <a href="#">
-                    <strong>{message.username}:</strong>
-                  </a>
+                  <Link to={`/profil/${message.username}`}>
+                    <strong>
+                      {message.username} :{""}{" "}
+                    </strong>
+                  </Link>
                   {message.message}
                 </div>
               </div>
